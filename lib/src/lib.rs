@@ -1,14 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod sha256;
+pub mod types;
+pub mod util;
+pub mod crypto;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use serde::{Deserialize, Serialize};
+use uint::construct_uint;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+construct_uint! {
+   #[derive(Serialize, Deserialize)]
+    pub struct U256(4);
 }

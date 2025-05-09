@@ -1,7 +1,9 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::U256;
+use crate::{crypto::{PublicKey, Signature}, sha256::Hash, util::MerkleRoot, U256};
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BlockChain {
     blocks: Vec<Block>,
 }
@@ -16,6 +18,7 @@ impl BlockChain {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Block {
     header: BlockHeader,
     transactions: Vec<Transaction>,
@@ -29,16 +32,17 @@ impl Block {
         }
     }
 
-    pub fn hash() -> ! {
-        todo!()
+    pub fn hash(&self) -> Hash {
+        Hash::hash(self)
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BlockHeader {
     timestamp: DateTime<Utc>,
     nonce: u64,
-    prev_block_hash: [u8; 32],
-    merkle_root: [u8; 32],
+    prev_block_hash: Hash,
+    merkle_root: MerkleRoot,
     target: U256,
 }
 
@@ -46,8 +50,8 @@ impl BlockHeader {
     pub fn new( 
         timestamp: DateTime<Utc>,
         nonce: u64,
-        prev_block_hash: [u8; 32],
-        merkle_root: [u8; 32],
+        prev_block_hash: Hash,
+        merkle_root: MerkleRoot,
         target: U256,
     ) -> Self {
         Self {
@@ -59,11 +63,12 @@ impl BlockHeader {
         }
     }
 
-    pub fn hash() -> ! {
-        todo!()
+    pub fn hash(&self) -> Hash {
+        Hash::hash(self)
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Transaction {
     inputs: Vec<TransactionInput>,
     outputs: Vec<TransactionOutput>,
@@ -80,17 +85,26 @@ impl Transaction {
         }
     }
 
-    pub fn hash() -> ! {
-        todo!()
+    pub fn hash(&self) -> Hash {
+        Hash::hash(self)
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TransactionInput {
-    prev_transaction_output_hash: [u8; 32],
-    signature: [u8; 64],
+    prev_transaction_output_hash: Hash,
+    signature: Signature
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TransactionOutput {
     value: u64,
     unique_id: Uuid,
-    pubkey: [u8; 33],
+    pubkey: PublicKey
+}
+
+impl TransactionOutput {
+    pub fn new (&self) -> Hash {
+        Hash::hash(self)
+    }
 }
